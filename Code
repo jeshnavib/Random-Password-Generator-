@@ -1,0 +1,175 @@
+# code on Random Password Generator
+#include "LiquidCrystal.h"
+
+const int rs = 2, en = 3, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+
+int cs=9;
+const int contrast = 100;
+
+
+int h=12;
+int m=59;
+int s=45;
+int flag=1;
+int button1;
+int button2;
+
+int hs=1;
+int ms=0;
+
+
+const int Time_light=150;
+int bl_TO=Time_light;
+int bl=10;
+const int backlight=120;
+
+
+static uint32_t last_time, now = 0;
+
+
+void setup()
+{
+  lcd.begin(16,2);
+  pinMode(hs,INPUT_PULLUP);
+  pinMode(ms,INPUT_PULLUP);
+  analogWrite(cs,contrast);
+  analogWrite(bl,backlight);
+  now=millis();
+}
+
+
+void loop()
+{ 
+  lcd.begin(16,2);
+ lcd.setCursor(0,0);
+ lcd.print("Time ");
+ if(h<10)lcd.print("0");
+ lcd.print(h);
+ lcd.print(":");
+ if(m<10)lcd.print("0");
+ lcd.print(m);
+ lcd.print(":");
+ if(s<10)lcd.print("0");
+ lcd.print(s);
+
+ if(flag==0) lcd.print(" AM");
+ if(flag==1) lcd.print(" PM");
+ 
+ lcd.setCursor(0,1);// for Line 2
+ lcd.print("Precision clock");
+
+
+for ( int i=0 ;i<5 ;i++)
+{
+
+  while ((now-last_time)<200)
+  { 
+    now=millis();
+  }
+ 
+ last_time=now;
+
+ 
+ button1=digitalRead(hs);
+ button2=digitalRead(ms);
+
+ bl_TO--;
+ if(bl_TO==0)
+ {
+  analogWrite(bl,0);
+  bl_TO++;
+ }
+ 
+ if(  ((button1==0)|(button2==0)) & (bl_TO==1)  )
+ {
+  bl_TO=Time_light;
+  analogWrite(bl,backlight);
+
+  while ((button1==0)|(button2==0))
+  {
+   button1=digitalRead(hs);
+   button2=digitalRead(ms);
+  }
+ }
+ else
+ 
+ {
+  if(button1==0){
+   h=h+1;
+   bl_TO=Time_light;
+   analogWrite(bl,backlight);
+  }
+
+ if(button2==0){
+  s=0;
+  m=m+1;
+  bl_TO=Time_light;
+  analogWrite(bl,backlight);
+  }
+
+ if(s==60){
+  s=0;
+  m=m+1;
+ }
+ if(m==60)
+ {
+  m=0;
+  h=h+1;
+ }
+ if(h==13)
+ {
+  h=1;
+  flag=flag+1;
+  if(flag==2)flag=0;
+ }
+
+
+ if((button1==0)|(button2==0))
+ {
+ 
+  lcd.setCursor(0,0);
+  lcd.print("Time ");
+  if(h<10)lcd.print("0");
+  lcd.print(h);
+  lcd.print(":");
+  if(m<10)lcd.print("0");
+  lcd.print(m);
+  lcd.print(":");
+  if(s<10)lcd.print("0");
+  lcd.print(s);
+
+  if(flag==0) lcd.print(" AM");
+  if(flag==1) lcd.print(" PM");
+ 
+  lcd.setCursor(0,1);
+  lcd.print("Precision clock");
+ }
+
+
+ }
+}
+
+
+ s=s+1;
+    
+ if(s==60){
+  s=0;
+  m=m+1;
+ }
+ if(m==60)
+ {
+  m=0;
+  h=h+1;
+ }
+ if(h==13)
+ {
+  h=1;
+  flag=flag+1;
+  if(flag==2)flag=0;
+ } 
+ 
+
+
+}
